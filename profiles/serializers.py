@@ -10,11 +10,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         request = self.context['request']
         return request.user == obj.owner
 
-
     class Meta:
         model = Profile
         fields = [
             'id', 'owner', 'created_on', 'updated_on',
-            'name', 'content', 'image', 'is_owner'
+            'name', 'content', 'image', 'github', 'linkedin', 'is_owner'
         ]
-

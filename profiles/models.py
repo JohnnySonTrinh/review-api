@@ -7,10 +7,12 @@ class Profile(models.Model):
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255, blank=True)
-    content = models.TextField(blank=True)
+    content = models.TextField(max_length=1000, blank=True)
     image = models.ImageField(
         upload_to='images/', default='../default_profile_xw5she'
     )
+    github = models.URLField(max_length=200, blank=True)
+    linkedin = models.URLField(max_length=200, blank=True)
 
     class Meta:
         ordering = ['-created_on']
