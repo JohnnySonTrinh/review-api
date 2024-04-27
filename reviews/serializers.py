@@ -26,6 +26,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     def get_is_owner(self, obj):
         request = self.context.get('request')
         return obj.owner == request.user
+
     class Meta:
         model = Review
         fields = [
