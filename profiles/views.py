@@ -15,7 +15,7 @@ class ProfileList(APIView):
 
 class ProfileDetail(APIView):
     serializer_class = ProfileSerializer
-    permission_classes =[IsOwnerOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
     def get_object(self, pk):
         try:
@@ -32,8 +32,8 @@ class ProfileDetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk):
-        profile =self.get_object(pk)
-        serializer=ProfileSerializer(profile, data=request.data)
+        profile = self.get_object(pk)
+        serializer = ProfileSerializer(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
