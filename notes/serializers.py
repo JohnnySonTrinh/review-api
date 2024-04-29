@@ -1,8 +1,8 @@
 from rest_framework serializer
-from .model import Message
+from .model import Note
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class NoteSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     is_owner = serializers.SerializerMethodField()
     profile_id = serializers.ReadOnlyField(source='owner.profile.id')
@@ -13,16 +13,16 @@ class MessageSerializer(serializers.ModelSerializer):
         return request.user == obj.owner
 
     class Meta:
-        model = Message
+        model = Note
         fields = [
             'id', 'owner', 'is_owner', 'profile_id', 'profile_image',
             'review', 'created_on', 'updated_on', 'content'
         ]
 
 
-class MessageDetailSerializer(MessageCerializer):
+class NoteDetailSerializer(NoteCerializer):
     """
-    Serializer for the Message model used in Detail view
-    Message is a read only field so that we dont have to set it on each update
+    Serializer for the Note model used in Detail view
+    Note is a read only field so that we dont have to set it on each update
     """
     review = serializers.ReadOnlyField(source='review.id')
