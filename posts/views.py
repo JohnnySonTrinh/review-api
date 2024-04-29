@@ -6,6 +6,7 @@ from .models import Post
 from .serializers import PostSerializer
 from drf_api.permissions import IsOwnerOrReadOnly
 
+
 class PostList(APIView):
     serializer_class = PostSerializer
     permission_classes = [
@@ -31,6 +32,7 @@ class PostList(APIView):
         return Response(
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )
+
 
 class PostDetail(APIView):
     permission_classes = [IsOwnerOrReadOnly]

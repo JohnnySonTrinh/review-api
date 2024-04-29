@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from reviews.models import Review
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     # Serializer for the Review model
     owner = serializers.ReadOnlyField(source='owner.username')
@@ -32,6 +33,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'owner',
+            'is_owner',
             'created_on',
             'updated_on',
             'title',
@@ -41,5 +43,4 @@ class ReviewSerializer(serializers.ModelSerializer):
             'image',
             'profile_id',
             'profile_image',
-            'is_owner',
         ]

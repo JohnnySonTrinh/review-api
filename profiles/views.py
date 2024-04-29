@@ -8,10 +8,11 @@ from drf_api.permissions import IsOwnerOrReadOnly
 
 
 class ProfileList(APIView):
-    def get (self, request):
+    def get(self, request):
         profiles = Profile.objects.all()
-        serializer = ProfileSerializer(profiles, many= True)
+        serializer = ProfileSerializer(profiles, many=True)
         return Response(serializer.data)
+
 
 class ProfileDetail(APIView):
     serializer_class = ProfileSerializer
@@ -20,12 +21,11 @@ class ProfileDetail(APIView):
     def get_object(self, pk):
         try:
             profile = Profile.objects.get(pk=pk)
-            self.check_object_permissions (self.request, profile)
+            self.check_object_permissions(self.request, profile)
             return profile
         except Profile.DoesNotExist:
             raise Http404
 
-    
     def get(self, request, pk):
         profile = self.get_object(pk)
         serializer = ProfileSerializer(profile)

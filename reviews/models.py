@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Review(models.Model):
     """
-    Model for a review post. stores the title, content, github repo, 
+    Model for a review post. stores the title, content, github repo,
     live website, image, created_on, updated_on.
     """
     owner = models.ForeignKey(User, on_delete=models.CASCADE)

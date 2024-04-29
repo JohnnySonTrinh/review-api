@@ -6,6 +6,7 @@ from .models import Review
 from .serializers import ReviewSerializer
 from drf_api.permissions import IsOwnerOrReadOnly
 
+
 class ReviewList(APIView):
     serializer_class = ReviewSerializer
     permission_classes = [
@@ -15,8 +16,8 @@ class ReviewList(APIView):
     def get(self, request):
         reviews = Review.objects.all()
         serializer = ReviewSerializer(
-        reviews, many=True, context={'request': request}
-    )
+            reviews, many=True, context={'request': request}
+        )
         return Response(serializer.data)
 
     def post(self, request):
@@ -31,6 +32,7 @@ class ReviewList(APIView):
         return Response(
             serializer.errors, status=status.HTTP_400_BAD_REQUEST
         )
+
 
 class ReviewDetail(APIView):
     permission_classes = [IsOwnerOrReadOnly]
