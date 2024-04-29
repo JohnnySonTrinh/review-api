@@ -9,4 +9,5 @@ urlpatterns = [
     path('', include('posts.urls')),
     path('', include('reviews.urls')),
     path('', include('comments.urls')),
+    path('', include('notes.urls')),
 ]

@@ -1,5 +1,5 @@
-from rest_framework serializer
-from .model import Note
+from rest_framework import serializers
+from .models import Note
 
 
 class NoteSerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class NoteSerializer(serializers.ModelSerializer):
         ]
 
 
-class NoteDetailSerializer(NoteCerializer):
+class NoteDetailSerializer(NoteSerializer):
     """
     Serializer for the Note model used in Detail view
     Note is a read only field so that we dont have to set it on each update
