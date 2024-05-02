@@ -13,10 +13,10 @@ class Like(models.Model):
     review = models.ForeignKey(
         Review, related_name='likes', on_delete=models.CASCADE
     )
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_on = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_on']
         unique_together = ['owner', 'review']
 
     def __str__(self):
