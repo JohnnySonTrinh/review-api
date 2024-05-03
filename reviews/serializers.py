@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from reviews.models import Review
+from likes.models import Like
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -8,6 +9,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     is_owner = serializers.SerializerMethodField()
     profile_id = serializers.ReadOnlyField(source='owner.profile.id')
     profile_image = serializers.ReadOnlyField(source='owner.profile.image.url')
+    like_id = serializers.SerializerMethodField()
 
     def validate_image(self, value):
         if value.size > 1024 * 1024 * 2:
@@ -25,8 +27,17 @@ class ReviewSerializer(serializers.ModelSerializer):
         return value
 
     def get_is_owner(self, obj):
-        request = self.context.get('request')
-        return obj.owner == request.user
+        request = self.context['request']
+        return request.user == obj.owner
+
+    def get_like_id(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            like = Like.objects.filter(
+                owner=user, review=obj
+            ).first()
+            return like.id if like else None
+        return None
 
     class Meta:
         model = Review
@@ -43,4 +54,5 @@ class ReviewSerializer(serializers.ModelSerializer):
             'image',
             'profile_id',
             'profile_image',
+            'like_id',
         ]
