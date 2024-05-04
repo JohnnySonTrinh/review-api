@@ -23,8 +23,8 @@ class ProfileList(generics.ListAPIView):
         'reviews_count',
         'followers_count',
         'following_count',
-        'owner__following__created_at',
-        'owner__followed__created_at',
+        'owner__following__created_on',
+        'owner__followed__created_on',
     ]
 
 class ProfileDetail(generics.RetrieveUpdateAPIView):
