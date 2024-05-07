@@ -22,7 +22,7 @@ class Review(models.Model):
     )
     image = models.ImageField(
         upload_to='images/',
-        default='../default_post_xw5she'
+        default='../default_post_fe0uhn'
     )
 
     class Meta:
