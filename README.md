@@ -1,3 +1,160 @@
+# STAR REVIEW API
+
+API for star review app.
+You can find detailed information in [Front-end repo](https://github.com/JohnnySonTrinh/review-app).
+
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/t/JohnnySonTrinh/review-api)](https://github.com/JohnnySonTrinh/review-api/commits/main)
+[![GitHub last commit](https://img.shields.io/github/last-commit/JohnnySonTrinh/review-api)](https://github.com/JohnnySonTrinh/review-api/commits/main)
+[![GitHub repo size](https://img.shields.io/github/repo-size/JohnnySonTrinh/review-api)](https://github.com/JohnnySonTrinh/review-api)
+
+## Tools & Technologies Used
+
+- [![Markdown Builder](https://img.shields.io/badge/Markdown_Builder-grey?logo=markdown&logoColor=000000)](https://tim.2bn.dev/markdown-builder) used to generate README and TESTING templates.
+- [![Git](https://img.shields.io/badge/Git-grey?logo=git&logoColor=F05032)](https://git-scm.com) used for version control. (`git add`, `git commit`, `git push`)
+- [![GitHub](https://img.shields.io/badge/GitHub-grey?logo=github&logoColor=181717)](https://github.com) used for secure online code storage.
+- [![Gitpod](https://img.shields.io/badge/Gitpod-grey?logo=gitpod&logoColor=FFAE33)](https://gitpod.io) used as a cloud-based IDE for development.
+- [![Python](https://img.shields.io/badge/Python-grey?logo=python&logoColor=3776AB)](https://www.python.org) used as the back-end programming language.
+- [![Heroku](https://img.shields.io/badge/Heroku-grey?logo=heroku&logoColor=430098)](https://www.heroku.com) used for hosting the deployed back-end site.
+- [![Django](https://img.shields.io/badge/Django-grey?logo=django&logoColor=092E20)](https://www.djangoproject.com) used as the Python framework for the site.
+- [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-grey?logo=postgresql&logoColor=4169E1)](https://www.postgresql.org) used as the relational database management.
+- [![Cloudinary](https://img.shields.io/badge/Cloudinary-grey?logo=cloudinary&logoColor=3448C5)](https://cloudinary.com) used for online static file storage.
+- [![WhiteNoise](https://img.shields.io/badge/WhiteNoise-grey?logo=python&logoColor=FFFFFF)](https://whitenoise.readthedocs.io) used for serving static files with Heroku.
+- [![Font Awesome](https://img.shields.io/badge/Font_Awesome-grey?logo=fontawesome&logoColor=528DD7)](https://fontawesome.com) used for the icons.
+- [![ChatGPT](https://img.shields.io/badge/ChatGPT-grey?logo=chromatic&logoColor=75A99C)](https://chat.openai.com) used to help debug, troubleshoot, and explain things
+
+## Database Model
+
+This project is built on a relational database, using PostgreSQL. The various elements of this project are related to each other in a number of ways, mostly via user primary keys assigned as foreignkeys to different elements.
+
+![ERD](documentation/erd.png)
+
+
+### Profile Model
+
+```python
+class Profile(models.Model):
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=255, blank=True)
+    content = models.TextField(max_length=1000, blank=True)
+    image = models.ImageField(
+        upload_to='images/', default='../default_profile_xw5she'
+    )
+    github = models.URLField(max_length=200, blank=True)
+    linkedin = models.URLField(max_length=200, blank=True)
+
+    class Meta:
+        ordering = ['-created_on']
+
+    def __str__(self):
+        return f"{self.owner}'s profile"
+```
+
+### Review Model
+
+```python
+class Review(models.Model):
+    """
+    Model for a review post. stores the title, content, github repo,
+    live website, image, created_on, updated_on.
+    """
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    title = models.CharField(max_length=255, blank=False)
+    content = models.TextField(max_length=1000, blank=True)
+    github_repo = models.URLField(
+        blank=True,
+        max_length=255,
+    )
+    live_website = models.URLField(
+        blank=True,
+        max_length=255,
+    )
+    image = models.ImageField(
+        upload_to='images/',
+        default='../default_post_fe0uhn'
+    )
+
+    class Meta:
+        ordering = ['created_on']
+
+    def __str__(self):
+        return f'{self.id} - {self.title}'
+```
+
+### Note Model
+
+```python
+class Note(models.Model):
+    """
+    Note model, related to User and Review
+    """
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+    content = models.TextField()
+
+    class Meta:
+        ordering = ['-created_on']
+
+    def __str__(self):
+        return self.content
+```
+
+### Like Model
+
+```python
+class Like(models.Model):
+    """
+    Like model, related to 'owner' and 'review'.
+    'owner' is a User instance and 'review' is a review instance.
+    'unique_together' makes sure a user can't like the same review twice.
+    """
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(
+        Review, related_name='likes', on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_on']
+        unique_together = ['owner', 'review']
+
+    def __str__(self):
+        return f'{self.owner} {self.review}'
+```
+
+### Follower Model
+
+```python
+class Follower(models.Model):
+    """
+    Follower model, related to 'owner' and 'followed'.
+    'owner' is a User that is following a User.
+    'followed' is a User that is followed by 'owner'.
+    We need the related_name attribute so that django can differentiate.
+    between 'owner' and 'followed' who both are User model instances.
+    'unique_together' makes sure a user can't 'double follow' the same user.
+    """
+    owner = models.ForeignKey(
+        User, related_name='following', on_delete=models.CASCADE
+    )
+    followed = models.ForeignKey(
+        User, related_name='followed', on_delete=models.CASCADE
+    )
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_on']
+        unique_together = ['owner', 'followed']
+
+    def __str__(self):
+        return f'{self.owner} {self.followed}'
+```
+
 ## Testing
 
 > [!NOTE]  
@@ -5,9 +162,20 @@
 
 ## Deployment
 
-The live deployed application can be found deployed on [Heroku](https://coach-platform-api-b2a0c10b1c34.herokuapp.com).
+The live deployed application can be found deployed on [Heroku](https://star-review-api-99b8eca24b61.herokuapp.com).
 
 This section provides a step-by-step guide to deploy the Django application with a Heroku and PostgreSQL database.
+
+### Cloudinary API
+
+This project uses the [Cloudinary API](https://cloudinary.com) to store media assets online, due to the fact that Heroku doesn't persist this type of data.
+
+To obtain your own Cloudinary API key, create an account and log in.
+
+- For *Primary interest*, you can choose *Programmable Media for image and video API*.
+- Optional: *edit your assigned cloud name to something more memorable*.
+- On your Cloudinary Dashboard, you can copy your **API Environment Variable**.
+- Be sure to remove the `CLOUDINARY_URL=` as part of the API **value**; this is the **key**.
 
 ### Prerequisites
 
@@ -202,4 +370,10 @@ You can fork this repository by using the following steps:
 
 
 ## Content
-https://www.django-rest-framework.org
+
+| Source                                                                      | Location        | Notes                               |
+| --------------------------------------------------------------------------- | --------------- | ----------------------------------- |
+| [Chris Beams](https://chris.beams.io/posts/git-commit)                      | version control | "How to Write a Git Commit Message" |
+| [DRF API](https://www.youtube.com/@mediaupload2326)                         | entire app      | API Walkthrough                     |
+| [Django docs](https://docs.djangoproject.com/en/5.0/)                       | entire site     | Django/python syntax                |
+| [Django Rest Framework](https://www.django-rest-framework.org/)             | API					| DRF docs						           |
