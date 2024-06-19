@@ -1,7 +1,8 @@
+from django.db.models import Avg
 from rest_framework import serializers
 from reviews.models import Review
 from likes.models import Like
-
+from ratings.models import Rating
 
 class ReviewSerializer(serializers.ModelSerializer):
     # Serializer for the Review model
@@ -12,6 +13,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     like_id = serializers.SerializerMethodField()
     likes_count = serializers.ReadOnlyField()
     notes_count = serializers.ReadOnlyField()
+    average_rating = serializers.SerializerMethodField()
 
     def validate_image(self, value):
         if value.size > 1024 * 1024 * 2:
@@ -41,6 +43,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             return like.id if like else None
         return None
 
+    def get_average_rating(self, obj):
+        ratings = Rating.objects.filter(review=obj)
+        return ratings.aggregate(average=Avg('stars'))['average'] if ratings.exists() else 0
+
     class Meta:
         model = Review
         fields = [
@@ -59,4 +65,5 @@ class ReviewSerializer(serializers.ModelSerializer):
             'like_id',
             'likes_count',
             'notes_count',
+            'average_rating',
         ]
