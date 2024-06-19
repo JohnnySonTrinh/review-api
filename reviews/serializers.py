@@ -14,6 +14,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     likes_count = serializers.ReadOnlyField()
     notes_count = serializers.ReadOnlyField()
     average_rating = serializers.SerializerMethodField()
+    rating_id = serializers.SerializerMethodField()
 
     def validate_image(self, value):
         if value.size > 1024 * 1024 * 2:
@@ -47,6 +48,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         ratings = Rating.objects.filter(review=obj)
         return ratings.aggregate(average=Avg('stars'))['average'] if ratings.exists() else 0
 
+    def get_rating_id(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            rating = Rating.objects.filter(
+                owner=user, review=obj
+            ).first()
+            return rating.id if rating else None
+        return None
+
     class Meta:
         model = Review
         fields = [
@@ -66,4 +76,5 @@ class ReviewSerializer(serializers.ModelSerializer):
             'likes_count',
             'notes_count',
             'average_rating',
+            'rating_id',
         ]

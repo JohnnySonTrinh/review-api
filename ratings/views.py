@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from drf_api.permissions import IsOwnerOrReadOnly
-from .models import Rating
-from .serializers import RatingSerializer
+from ratings.models import Rating
+from ratings.serializers import RatingSerializer
 
 class RatingList(generics.ListCreateAPIView):
     """
