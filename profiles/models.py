@@ -10,7 +10,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=255, blank=True)
     content = models.TextField(max_length=1000, blank=True)
     image = models.ImageField(
-        upload_to='images/', default='../default_profile_xw5she'
+        upload_to='images/', default='../default_profile_xw5shd'
     )
     github = models.URLField(max_length=200, blank=True)
     linkedin = models.URLField(max_length=200, blank=True)
