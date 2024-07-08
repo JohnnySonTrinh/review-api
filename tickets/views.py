@@ -1,12 +1,13 @@
+# tickets/views.py
+
 from rest_framework import generics, permissions
+from rest_framework.response import Response
 from .models import Ticket
 from .serializers import TicketSerializer
-from drf_api.permissions import IsOwnerOrReadOnly
 
 class TicketListCreateView(generics.ListCreateAPIView):
     """
-    View to list all tickets or create a new ticket.
-    Only authenticated users can create tickets.
+    List all tickets or create a new ticket.
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
@@ -17,9 +18,17 @@ class TicketListCreateView(generics.ListCreateAPIView):
 
 class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
-    View to retrieve, update or delete a ticket.
-    Only the owner of the ticket or admin can update or delete it.
+    Retrieve, update or delete a ticket instance.
     """
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if 'resolved' in request.data:
+            instance.resolved = request.data['resolved']
+            instance.save()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        return super().patch(request, *args, **kwargs)
