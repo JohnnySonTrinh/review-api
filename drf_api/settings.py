@@ -108,7 +108,6 @@ if client_origin_dev:
 
 # Ensure other required CORS settings
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ['*']
 
 
 ROOT_URLCONF = 'drf_api.urls'
