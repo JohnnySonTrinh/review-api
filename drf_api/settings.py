@@ -93,18 +93,23 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Print the CLIENT_ORIGIN_DEV environment variable for debugging
+client_origin_dev = os.environ.get('CLIENT_ORIGIN_DEV', '')
+
+
 CORS_ALLOWED_ORIGINS = [
     "https://star-review-app-fb4aac8cda63.herokuapp.com",
 ]
 
-if 'CLIENT_ORIGIN_DEV' in os.environ:
-    client_origin_dev = os.environ.get('CLIENT_ORIGIN_DEV', '')
-    extracted_url = re.match(r'^https?://[^/]+', client_origin_dev, re.IGNORECASE).group(0)
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        rf"{extracted_url}\.gitpod\.io$",
-    ]
+# Directly append the CLIENT_ORIGIN_DEV to CORS_ALLOWED_ORIGINS
+if client_origin_dev:
+    CORS_ALLOWED_ORIGINS.append(client_origin_dev)
 
+
+# Ensure other required CORS settings
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
+
 
 ROOT_URLCONF = 'drf_api.urls'
 
