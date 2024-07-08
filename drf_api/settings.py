@@ -92,15 +92,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-if 'CLIENT_ORIGIN_DEV' in os.environ:
-    extracted_url = re.match(r'^.+-', os.environ.get('CLIENT_ORIGIN_DEV', ''), re.IGNORECASE).group(0)
-    CORS_ALLOWED_ORIGIN_REGEXES = [
-        rf"{extracted_url}(eu|us)\d+\w\.gitpod\.io$",
-    ]
 
 CORS_ALLOWED_ORIGINS = [
     "https://star-review-app-fb4aac8cda63.herokuapp.com",
 ]
+
+if 'CLIENT_ORIGIN_DEV' in os.environ:
+    client_origin_dev = os.environ.get('CLIENT_ORIGIN_DEV', '')
+    extracted_url = re.match(r'^https?://[^/]+', client_origin_dev, re.IGNORECASE).group(0)
+    CORS_ALLOWED_ORIGIN_REGEXES = [
+        rf"{extracted_url}\.gitpod\.io$",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 
