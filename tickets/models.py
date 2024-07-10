@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Ticket(models.Model):
     """
     A model for users to submit inquiries or support tickets.

@@ -1,9 +1,8 @@
-# tickets/views.py
-
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from .models import Ticket
 from .serializers import TicketSerializer
+
 
 class TicketListCreateView(generics.ListCreateAPIView):
     """
@@ -15,6 +14,7 @@ class TicketListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 class TicketDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
