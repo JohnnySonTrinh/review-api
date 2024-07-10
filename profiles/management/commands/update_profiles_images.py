@@ -2,6 +2,7 @@ import random
 from django.core.management.base import BaseCommand
 from profiles.models import Profile
 
+
 class Command(BaseCommand):
     help = 'Update all profile images to a random default image'
 
@@ -9,7 +10,7 @@ class Command(BaseCommand):
     DEFAULT_IMAGES = [
         '../default_profile_h8s2sm.webp',
         '../default_profile_kxm3io.webp',
-        '../default_profile_xw5shd.webp',
+        # '../default_profile_xw5shd.webp',
         # Add more paths to default images as needed
     ]
 
@@ -18,5 +19,8 @@ class Command(BaseCommand):
         for profile in profiles:
             profile.image = random.choice(self.DEFAULT_IMAGES)
             profile.save()
-        self.stdout.write(self.style.SUCCESS('Successfully updated all profile images'))
-
+        self.stdout.write(
+            self.style.SUCCESS(
+                'Successfully updated all profile images'
+            )
+        )
