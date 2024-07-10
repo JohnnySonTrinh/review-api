@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from reviews.models import Review
 
+
 class Rating(models.Model):
     """
     Rating model, related to 'owner' and 'review'.

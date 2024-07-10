@@ -4,6 +4,7 @@ from reviews.models import Review
 from likes.models import Like
 from ratings.models import Rating
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     # Serializer for the Review model
     owner = serializers.ReadOnlyField(source='owner.username')
@@ -46,7 +47,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def get_average_rating(self, obj):
         ratings = Rating.objects.filter(review=obj)
-        return ratings.aggregate(average=Avg('stars'))['average'] if ratings.exists() else 0
+        if ratings.exists():
+            return ratings.aggregate(average=Avg('stars'))['average']
+        else:
+            return 0
 
     def get_rating_id(self, obj):
         user = self.context['request'].user

@@ -3,6 +3,7 @@ from drf_api.permissions import IsOwnerOrReadOnly
 from ratings.models import Rating
 from ratings.serializers import RatingSerializer
 
+
 class RatingList(generics.ListCreateAPIView):
     """
     List ratings or create a rating if logged in.
@@ -13,6 +14,7 @@ class RatingList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
 
 class RatingDetail(generics.RetrieveDestroyAPIView):
     """
