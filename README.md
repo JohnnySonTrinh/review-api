@@ -26,8 +26,18 @@ You can find detailed information in [Front-end repo](https://github.com/JohnnyS
 
 This project is built on a relational database, using PostgreSQL. The various elements of this project are related to each other in a number of ways, mostly via user primary keys assigned as foreignkeys to different elements.
 
-![ERD](documentation/erd.png)
+<details>
+<summary> Click here to see old ERD </summary>
 
+#### Without Rating and Tickets Model
+
+- ![screenshot](documentation/erd.png)
+
+</details>
+
+### Updated ERD
+
+![ERD](documentation/erd-v2.png)
 
 ### Profile Model
 
@@ -155,6 +165,62 @@ class Follower(models.Model):
         return f'{self.owner} {self.followed}'
 ```
 
+### Rating Model
+
+```python
+from django.db import models
+from django.contrib.auth.models import User
+from reviews.models import Review
+
+
+class Rating(models.Model):
+    """
+    Rating model, related to 'owner' and 'review'.
+    'owner' is a User instance and 'review' is a review instance.
+    'stars' is an integer field with choices from 1 to 5.
+    'unique_together' ensures a user can't rate the same review twice.
+    """
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    review = models.ForeignKey(
+        Review, related_name='ratings', on_delete=models.CASCADE
+    )
+    stars = models.IntegerField(choices=[(i, str(i)) for i in range(1, 6)])
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_on']
+        unique_together = ['owner', 'review']
+
+    def __str__(self):
+        return f'{self.owner} rated {self.review} - {self.stars} stars'
+
+```
+
+### Ticket Model
+
+```python
+from django.db import models
+from django.contrib.auth.models import User
+
+
+class Ticket(models.Model):
+    """
+    A model for users to submit inquiries or support tickets.
+    """
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='tickets'
+        )
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    email = models.EmailField()
+    created_on = models.DateTimeField(auto_now_add=True)
+    resolved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Ticket {self.id} from {self.owner.username}'
+
+```
+
 ## Testing
 
 > [!NOTE]  
@@ -172,10 +238,69 @@ This project uses the [Cloudinary API](https://cloudinary.com) to store media as
 
 To obtain your own Cloudinary API key, create an account and log in.
 
-- For *Primary interest*, you can choose *Programmable Media for image and video API*.
-- Optional: *edit your assigned cloud name to something more memorable*.
+- For _Primary interest_, you can choose _Programmable Media for image and video API_.
+- Optional: _edit your assigned cloud name to something more memorable_.
 - On your Cloudinary Dashboard, you can copy your **API Environment Variable**.
 - Be sure to remove the `CLOUDINARY_URL=` as part of the API **value**; this is the **key**.
+
+<details>
+<summary> Click here to run the commands to change profile images </summary>
+
+### Update user image
+
+- Upload Avatar images to Cloudinary
+- Run the command `python manage.py update_profile_image <username>` for single profile avatar image
+
+  OR
+
+- Run the command `update_profiles_images` for all profiles avatar images
+
+```python
+import random
+from django.core.management.base import BaseCommand
+from profiles.models import Profile
+
+
+class Command(BaseCommand):
+    help = 'Update a profile image to a random default image'
+
+    # List of default images
+    DEFAULT_IMAGES = [
+        # '../default_profile_h8s2sm.webp',
+        # '../default_profile_kxm3io.webp',
+        '../default_profile_xw5shd.webp',
+    ]
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            'username', type=str,
+            help=(
+                'The username of the user whose profile image '
+                'needs to be updated'
+            )
+        )
+
+    def handle(self, *args, **kwargs):
+        username = kwargs['username']
+        try:
+            profile = Profile.objects.get(owner__username=username)
+            profile.image = random.choice(self.DEFAULT_IMAGES)
+            profile.save()
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'Successfully updated profile image for user {username}'
+                )
+            )
+        except Profile.DoesNotExist:
+            self.stdout.write(
+                self.style.ERROR(
+                    f'Profile for user {username} does not exist'
+                )
+            )
+
+```
+
+</details>
 
 ### Prerequisites
 
@@ -368,12 +493,11 @@ You can fork this repository by using the following steps:
 - **Local**: I use SQLite as your database for simplicity and ease of setup in a local development environment.
 - **Deployment**: On Heroku, I use a more robust database like PostgreSQL. Heroku offers its own PostgreSQL service, which can be easily integrated into the project.
 
-
 ## Content
 
-| Source                                                                      | Location        | Notes                               |
-| --------------------------------------------------------------------------- | --------------- | ----------------------------------- |
-| [Chris Beams](https://chris.beams.io/posts/git-commit)                      | version control | "How to Write a Git Commit Message" |
-| [DRF API](https://www.youtube.com/@mediaupload2326)                         | entire app      | API Walkthrough                     |
-| [Django docs](https://docs.djangoproject.com/en/5.0/)                       | entire site     | Django/python syntax                |
-| [Django Rest Framework](https://www.django-rest-framework.org/)             | API					| DRF docs						           |
+| Source                                                          | Location        | Notes                               |
+| --------------------------------------------------------------- | --------------- | ----------------------------------- |
+| [Chris Beams](https://chris.beams.io/posts/git-commit)          | version control | "How to Write a Git Commit Message" |
+| [DRF API](https://www.youtube.com/@mediaupload2326)             | entire app      | API Walkthrough                     |
+| [Django docs](https://docs.djangoproject.com/en/5.0/)           | entire site     | Django/python syntax                |
+| [Django Rest Framework](https://www.django-rest-framework.org/) | API             | DRF docs                            |
